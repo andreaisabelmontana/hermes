@@ -1,0 +1,164 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Wearable Swarm Control System — Built From Scratch</title>
+<meta name="description" content="An original from-scratch build of a wearable swarm control system: sensor gloves and a haptic vest that command a multi-robot swarm through gestures over ROS." />
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,500;9..144,600&family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet" />
+<style>
+  :root{
+    --accent:#7c3aed; --accent-soft:#f1eafe; --ink:#16201f; --muted:#5d6b69;
+    --line:#dfe5e3; --bg:#fbfcfb; --card:#ffffff;
+    --serif:'Fraunces',Georgia,serif; --sans:'Inter',system-ui,sans-serif; --mono:'JetBrains Mono',monospace;
+  }
+  *{box-sizing:border-box}
+  html{scroll-behavior:smooth}
+  body{margin:0;background:var(--bg);color:var(--ink);font-family:var(--sans);line-height:1.65;-webkit-font-smoothing:antialiased}
+  .wrap{max-width:860px;margin:0 auto;padding:0 28px}
+  a{color:var(--accent);text-decoration:none}
+  a:hover{text-decoration:underline}
+  code{font-family:var(--mono);font-size:.86em;background:var(--accent-soft);padding:.1em .4em;border-radius:4px;color:#6d28d9}
+  h1,h2,h3{font-family:var(--serif);font-weight:500;line-height:1.15;letter-spacing:-.01em}
+  /* Header */
+  header.hero{padding:88px 0 56px;border-bottom:1px solid var(--line)}
+  .eyebrow{font-family:var(--mono);font-size:.74rem;letter-spacing:.18em;text-transform:uppercase;color:var(--accent);margin:0 0 22px}
+  h1{font-size:clamp(2.6rem,6vw,4.1rem);margin:0 0 18px}
+  .lede{font-size:1.22rem;color:var(--muted);max-width:62ch;margin:0 0 28px}
+  .meta{display:flex;flex-wrap:wrap;gap:10px;font-size:.82rem}
+  .chip{font-family:var(--mono);font-size:.72rem;letter-spacing:.04em;border:1px solid var(--line);border-radius:999px;padding:5px 12px;color:var(--muted);background:var(--card)}
+  /* Sections */
+  section{padding:54px 0;border-bottom:1px solid var(--line)}
+  .kicker{font-family:var(--mono);font-size:.74rem;letter-spacing:.16em;text-transform:uppercase;color:var(--accent);margin:0 0 14px}
+  h2{font-size:clamp(1.7rem,3.4vw,2.3rem);margin:0 0 20px}
+  h3{font-size:1.2rem;margin:0 0 6px}
+  p{margin:0 0 18px;max-width:68ch}
+  .muted{color:var(--muted)}
+  /* Stack grid */
+  .grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:16px;margin-top:8px}
+  .tool{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:20px}
+  .tool .t{font-family:var(--mono);font-size:.78rem;color:var(--accent);letter-spacing:.04em;margin-bottom:8px}
+  .tool h3{font-size:1.05rem;font-family:var(--sans);font-weight:600;margin-bottom:6px}
+  .tool p{font-size:.92rem;color:var(--muted);margin:0}
+  /* Pipeline / modules */
+  ol.flow{counter-reset:s;list-style:none;padding:0;margin:24px 0 0}
+  ol.flow li{position:relative;padding:18px 0 18px 56px;border-top:1px solid var(--line)}
+  ol.flow li:before{counter-increment:s;content:counter(s,decimal-leading-zero);position:absolute;left:0;top:18px;font-family:var(--mono);font-size:.8rem;color:var(--accent);border:1px solid var(--line);border-radius:8px;width:38px;height:38px;display:grid;place-items:center;background:var(--card)}
+  ol.flow li h3{font-family:var(--sans);font-size:1.02rem;font-weight:600;margin:0 0 4px}
+  ol.flow li p{margin:0;font-size:.93rem;color:var(--muted)}
+  .tag{display:inline-block;font-family:var(--mono);font-size:.68rem;padding:2px 7px;border-radius:5px;margin-left:8px;vertical-align:middle}
+  .tag.on{background:#e6f7ec;color:#1c7a43}
+  .tag.off{background:#fdecea;color:#b23b2c}
+  /* Callout */
+  .callout{background:var(--accent-soft);border:1px solid #ddccfb;border-radius:14px;padding:24px 26px;margin-top:8px}
+  .callout p:last-child{margin:0}
+  /* Reflection list */
+  ul.learn{list-style:none;padding:0;margin:8px 0 0}
+  ul.learn li{padding:14px 0 14px 30px;border-top:1px solid var(--line);position:relative;color:var(--muted);max-width:68ch}
+  ul.learn li:before{content:"→";position:absolute;left:0;color:var(--accent);font-family:var(--mono)}
+  ul.learn li b{color:var(--ink);font-weight:600}
+  /* Footer */
+  footer{padding:48px 0 80px}
+  .credit{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:26px}
+  .credit .k{font-family:var(--mono);font-size:.72rem;letter-spacing:.14em;text-transform:uppercase;color:var(--muted);margin-bottom:10px}
+  footer .fine{font-size:.8rem;color:var(--muted);margin-top:22px;text-align:center}
+</style>
+</head>
+<body>
+<header class="hero">
+  <div class="wrap">
+    <p class="eyebrow">From-Scratch Build · Human–Robot Interaction</p>
+    <h1>Wearable Swarm Control System</h1>
+    <p class="lede">A pair of sensor gloves and a haptic vest that let one person command a swarm of mobile robots by hand. A hand posture picks a mode, finger taps issue orders, and the vest buzzes feedback back to the operator. Built from scratch to learn how the body becomes a controller.</p>
+    <div class="meta">
+      <span class="chip">ESP32 / ESP-NOW</span><span class="chip">ROS 2</span><span class="chip">IMU + flex sensors</span>
+      <span class="chip">Motion capture</span><span class="chip">Haptics</span>
+    </div>
+  </div>
+</header>
+
+<section>
+  <div class="wrap">
+    <p class="kicker">What it is</p>
+    <h2>Your hands are the joystick</h2>
+    <p>The system turns gestures into swarm commands. The <b>left glove</b> selects the active mode by posture — an open hand means drive, a point means select, a fist means formation. The <b>right glove</b> reads finger-pressure taps that pick the specific command. A <b>vest</b> collects the wireless glove packets, forwards them to a small onboard computer, and drives six haptic motors so the operator <i>feels</i> confirmations and warnings.</p>
+    <p>I built this because I wanted to understand the full chain from a finger bend to a robot moving: how a wearable sensor becomes a clean, safe intent that many robots can act on at once — without the operator ever looking at a screen.</p>
+    <div class="callout">
+      <p><b>The core idea I wanted to learn:</b> controlling a swarm isn't about steering each robot — it's about expressing <i>intent</i> ("form a wedge", "patrol the perimeter") and letting decentralised robots work out their own paths. The wearable just has to turn the body into a reliable, gated source of those intents.</p>
+    </div>
+  </div>
+</section>
+
+<section>
+  <div class="wrap">
+    <p class="kicker">The stack</p>
+    <h2>Tools under the hood</h2>
+    <p class="muted">This rebuild spans firmware, wireless links, robotics middleware and motion capture. Here is what each layer actually does.</p>
+    <div class="grid">
+      <div class="tool"><div class="t">sensing</div><h3>Flex + IMU + FSR</h3><p>Flex sensors and an IMU read hand posture and motion; force-sensitive resistors on the fingers register discrete taps.</p></div>
+      <div class="tool"><div class="t">wireless</div><h3>ESP-NOW</h3><p>A low-latency ESP32 radio protocol. Gloves broadcast packets to the vest with no Wi-Fi network in the loop.</p></div>
+      <div class="tool"><div class="t">bridge</div><h3>Raspberry Pi + serial</h3><p>The vest forwards validated packets over USB serial to a Pi, which publishes them into the robotics graph.</p></div>
+      <div class="tool"><div class="t">middleware</div><h3>ROS 2</h3><p>Carries raw input, recognised gestures, swarm intent and per-robot velocity commands between every node.</p></div>
+      <div class="tool"><div class="t">localisation</div><h3>Motion capture</h3><p>A motion-capture system supplies shared world-frame robot poses, so the swarm can hold real formations.</p></div>
+      <div class="tool"><div class="t">feedback</div><h3>Haptic vest</h3><p>Six motors translate system state back into touch — confirmations, mode changes and stop signals you can feel.</p></div>
+    </div>
+  </div>
+</section>
+
+<section>
+  <div class="wrap">
+    <p class="kicker">Architecture</p>
+    <h2>From finger to formation</h2>
+    <p>A command travels through a fixed chain of nodes. Each stage has one job, which keeps the safety-critical parts isolated and testable.</p>
+    <ol class="flow">
+      <li><h3>Gloves <span class="tag on">live</span></h3><p>Left and right ESP32s read sensors and broadcast packets over ESP-NOW.</p></li>
+      <li><h3>Vest gateway <span class="tag on">live</span></h3><p>Receives both gloves, validates packets, and bridges them to the Pi over serial.</p></li>
+      <li><h3>Gesture recognition <span class="tag on">live</span></h3><p>Classifies posture and finger taps into a mode and a discrete command.</p></li>
+      <li><h3>Safety gate <span class="tag on">live</span></h3><p>A deadman and shake-to-stop layer that gates all motion before any intent is published.</p></li>
+      <li><h3>Swarm controller <span class="tag on">live</span></h3><p>Turns intent into formations and behaviours, using shared robot poses.</p></li>
+      <li><h3>Robot agents <span class="tag on">live</span></h3><p>Each robot consumes swarm intent and computes its own local velocity command.</p></li>
+    </ol>
+  </div>
+</section>
+
+<section>
+  <div class="wrap">
+    <p class="kicker">The vocabulary</p>
+    <h2>What the swarm can be told</h2>
+    <p>The control language is small and deliberate — modes selected by posture, then orders chosen by finger taps:</p>
+    <ul class="learn">
+      <li><b>Modes:</b> drive, selection, formation, behaviour and parameter-tuning, each picked by a left-hand posture.</li>
+      <li><b>Formations:</b> line, column, wedge, circle, echelon, grid and diamond — shapes the swarm holds together.</li>
+      <li><b>Behaviours:</b> patrol, follow-path, hold-anchor, return-home, follow-me and disperse-to-scan.</li>
+      <li><b>Safety:</b> palm-up gates motion off, a shake triggers an emergency stop, and a tap pattern soft-pauses or resumes.</li>
+    </ul>
+    <p class="muted" style="margin-top:18px">In my rebuild I treated safety as the first feature, not the last — every intent passes the deadman and stop layer before a single robot moves.</p>
+  </div>
+</section>
+
+<section>
+  <div class="wrap">
+    <p class="kicker">Reflection</p>
+    <h2>What rebuilding it taught me</h2>
+    <ul class="learn">
+      <li><b>Intent beats teleoperation.</b> Publishing "form a wedge" and letting decentralised robots solve their own paths scales far better than steering each one.</li>
+      <li><b>Wireless choices are design choices.</b> ESP-NOW's low latency and no-network simplicity shaped the whole glove-to-vest link — Wi-Fi would have changed everything.</li>
+      <li><b>Safety has to be structural.</b> A deadman and an emergency stop only matter if every command physically passes through them — so I made that a node, not a checkbox.</li>
+      <li><b>Haptics close the loop.</b> Without feedback the operator is guessing; six small motors turned an open-loop controller into a conversation.</li>
+    </ul>
+  </div>
+</section>
+
+<footer>
+  <div class="wrap">
+    <div class="credit">
+      <div class="k">About this build</div>
+      <p style="margin:0">An original, from-scratch build by <b>Andrea</b> — written to learn how wearable sensors, wireless links, robotics middleware and haptics combine to let one person command a robot swarm by gesture. Plain HTML/CSS, deployed on GitHub Pages.</p>
+    </div>
+    <p class="fine">Built from scratch by Andrea · one of an ongoing series of learning builds.</p>
+  </div>
+</footer>
+</body>
+</html>
